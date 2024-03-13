@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Tree view des commissions -->
+    <record model="ir.ui.view" id="commission_tree">
+        <field name="name">commissions tree</field>
+        <field name="model">commission</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="commission_type"/>
+                <field name="settlement_type"/>
+                <field name="amount_base_type"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vue de recherche des commissions -->
+    <record model="ir.ui.view" id="commission_view_search">
+        <field name="name">Commission Search View</field>
+        <field name="model">commission</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="commission_type"/>
+                <field name="amount_base_type"/>
+
+                <!-- Filtres pour le type de commission -->
+                <filter name="with_fixed_commission_type" string="With Fixed Commission Type"
+                        domain="[('commission_type','=','fixed')]"/>
+                <filter name="with_section_commission_type" string="With Section Commission Type"
+                        domain="[('commission_type','=','section')]"/>
+
+                <!-- Filtres pour le type de montant de base -->
+                <filter name="gross_amount_base_type" string="With Gross Amount Base Type"
+                        domain="[('amount_base_type','=','gross_amount')]"/>
+                <filter name="net_amount_base_type" string="With Net Amount Base Type"
+                        domain="[('amount_base_type','=','net_amount')]"/>
+
+                <!-- Groupement par type de commission et type de montant de base -->
+                <group expand="0" string="Group By">
+                    <filter name="group_by_commission_type" string="Commission Type"
+                            context="{'group_by':'commission_type'}"/>
+                    <filter name="group_by_amount_base_type" string="Amount Base Type"
+                            context="{'group_by':'amount_base_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Vue du formulaire des commissions -->
+    <record model="ir.ui.view" id="commission_form">
+        <field name="name">commissions form</field>
+        <field name="model">commission</field>
+        <field name="arch" type="xml">
+            <form string="Commission">
+                <sheet>
+                    <widget
+                            name="web_ribbon"
+                            title="Archived"
+                            bg_color="bg-danger"
+                            attrs="{'invisible': [('active', '=', True)]}"
+                    />
+                    <group string="General information">
+                        <group>
+                            <field name="name"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group name="commission_params">
+                            <field name="commission_type"/>
+                            <field name="settlement_type"/>
+                            <field name="amount_base_type"/>
+                        </group>
+                    </group>
+                    <group string="Rates definition" colspan="4">
+                        <group colspan="2">
+                            <field
+                                    name="fix_qty"
+                                    attrs="{'invisible': [('commission_type', '!=', 'fixed')], 'required': [('commission_type', '=', 'fixed')]}"/>
+                        </group>
+                        <field
+                                name="section_ids"
+                                colspan="4"
+                                nolabel="1"
+                                attrs="{'invisible': [('commission_type', '!=', 'section')]}">
+                            <tree editable="bottom">
+                                <field name="amount_from"/>
+                                <field name="amount_to"/>
+                                <field name="percent"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </sheet>
+
+            </form>
+        </field>
+    </record>
+
+    <!-- Action pour les commissions -->
+    <record model="ir.actions.act_window" id="action_commission">
+        <field name="name">Commission types</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">commission</field>
+        <field name="binding_view_types">form,tree</field>
+    </record>
+
+    <!-- Élément de menu pour les types de commission -->
+    <menuitem
+            name="Commission types"
+            id="menu_commission_type"
+            parent="commission.menu_commission_management"
+            action="action_commission"
+    />
+</odoo>
